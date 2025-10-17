@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Library Information System</title>
+<style>
+/*GENERAL PAGE STYLING */
+*{margin:0;padding:0;box-sizing:border-box}
+
+/* Main body styling with gradient background */
+body{
+  font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;
+  background:linear-gradient(135deg,#f5f7fa 0%,#c3cfe2 100%);
+  color:#1e293b;
+  padding:24px;
+  min-height:100vh;
+}
+
+/* Main container styling */
+.container{
+  max-width:1200px;margin:0 auto;background:white;
+  border-radius:12px;box-shadow:0 10px 40px rgba(0,0,0,0.08);overflow:hidden;
+}
+
+/* Header section */
+header{
+  background:linear-gradient(135deg,#1e3a8a 0%,#3b82f6 100%);
+  padding:32px 40px;color:white;border-bottom:4px solid #1e40af;text-align:center;
+}
+
+/* Main heading style */
+h1{font-size:2rem;font-weight:700;letter-spacing:-0.5px;margin-bottom:8px;}
+.subtitle{font-size:0.95rem;opacity:0.9;font-weight:400;}
+.content{padding:32px 40px;}
+.section{margin-bottom:32px;}
+
+/* Section title styling */
+.section-title{
+  font-size:1.1rem;font-weight:600;color:#1e3a8a;margin-bottom:16px;
+  padding-bottom:8px;border-bottom:2px solid #e2e8f0;
+}
+
+/*FORM STYLING*/
+/* Form grid layout */
+form{display:grid;gap:12px;margin-bottom:24px;}
+/* Book form layout*/
+form#bookForm{grid-template-columns:1fr 1fr 1fr auto;}
+/* Borrower form layout*/
+form#borrowerForm{grid-template-columns:1fr 1fr auto;}
+/* Input and select field styling */
+input,select{
+  padding:12px 16px;border:1px solid #cbd5e1;border-radius:6px;
+  font-size:0.95rem;transition:all 0.2s;background:white;
+}
+input:focus,select:focus{outline:none;border-color:#3b82f6;box-shadow:0 0 0 3px rgba(59,130,246,0.1);}
+
+/* BUTTONS STYLING */
+/* Base button*/
+button{
+  padding:12px 20px;border-radius:6px;border:none;font-size:0.9rem;
+  font-weight:600;cursor:pointer;transition:all 0.2s;font-family:inherit;
+}
+/* Primary button*/
+button.primary{background:linear-gradient(135deg,#3b82f6 0%,#2563eb 100%);color:white;box-shadow:0 2px 8px rgba(59,130,246,0.3);}
+button.primary:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(59,130,246,0.4);}
+/* Secondary button*/
+button.secondary{background:white;color:#475569;border:1px solid #cbd5e1;}
+button.secondary:hover{background:#f8fafc;border-color:#94a3b8;}
+/* Danger button - red for delete actions */
+button.danger{background:#ef4444;color:white;}
+button.danger:hover{background:#dc2626;}
+
+/* CONTROLS SECTION*/
+/* Control buttons container*/
+.controls{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:20px;padding:20px;background:#f8fafc;border-radius:8px;border:1px solid #e2e8f0;align-items:center;}
+/*  DROPDOWN MENU STYLING*/
+/* Dropdown button container */
+.dropdown{position:relative;display:inline-block;}
+/* Dropdown menu popup*/
+.dropdown-menu{
+  display:none;position:absolute;top:110%;left:0;background:white;
+  border:1px solid #cbd5e1;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.08);
+  z-index:10;
+}
+/* Dropdown menu buttons */
+.dropdown-menu button{
+  display:block;width:100%;text-align:left;background:white;color:#1e293b;
+  padding:8px 12px;border:none;border-bottom:1px solid #e2e8f0;
+}
+.dropdown-menu button:hover{background:#f1f5f9;}
+
+/* SUMMARY STATISTICS BOX  */
+#summary{
+  background:linear-gradient(135deg,#dbeafe 0%,#bfdbfe 100%);
+  padding:16px 24px;border-radius:8px;border-left:4px solid #3b82f6;
+  margin-top:24px;font-weight:600;color:#1e3a8a;display:flex;justify-content:space-around;text-align:center;
+}
+/* Individual stat container */
+.stat{display:flex;flex-direction:column;gap:4px;}
+
+.stat-label{font-size:0.85rem;font-weight:500;opacity:0.8;}
+.stat-value{font-size:1.5rem;font-weight:700;}
+
+/* TABLE STYLING*/
+/* Table layout for book list */
+table{width:100%;border-collapse:collapse;border:1px solid #e2e8f0;border-radius:8px;overflow:hidden;}
+th,td{padding:12px 16px;border-bottom:1px solid #f1f5f9;font-size:0.95rem;text-align:left;}
+th{background:linear-gradient(135deg,#f1f5f9 0%,#e2e8f0 100%);font-weight:700;color:#1e3a8a;}
+tr:hover{background:#f8fafc;}
+.status{padding:4px 10px;border-radius:12px;font-size:0.85rem;font-weight:600;}
+
+/* Available status*/
+.available{background:#d1fae5;color:#065f46;}
+/* Borrowed status */
+.borrowed{background:#fee2e2;color:#991b1b;}
+/* Overdue text */
+.overdue{color:red;font-weight:700;}
+
+/* Action buttons*/
+.actions{display:flex;gap:6px;}
+.actions button{padding:6px 12px;font-size:0.85rem;}
+
+.empty-state{text-align:center;padding:40px 20px;color:#94a3b8;}
+
+/* CARD VIEW STYLING */
+.card-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;}
+.card{background:white;border:1px solid #e2e8f0;border-radius:8px;padding:16px;box-shadow:0 6px 18px rgba(2,6,23,0.03);}
+.card h3{margin-bottom:8px;font-size:1.05rem;}
+.card p{margin-bottom:6px;color:#475569;font-size:0.92rem;}
+
+/* View toggle button */
+.view-toggle{margin-left:auto;}
+
+/* BOOK LIST BOX */
+.book-list-box{background:#eef6ff;padding:16px;border-radius:8px;border:1px solid #d6eaff;}
+
+/* MODAL STYLING */
+.overlay-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.4);display:flex;align-items:center;justify-content:center;z-index:9999;}
+.modal-box{background:white;padding:20px;border-radius:8px;min-width:340px;box-shadow:0 8px 30px rgba(2,6,23,0.2);display:flex;flex-direction:column;gap:10px;}
+
+.year-invalid{color:#b91c1c;font-size:0.85rem;margin-top:-6px;display:none;}
+</style>
+</head>
+<body>
+<div class="container">
+    
+<!--HEADER SECTION-->
+<header>
+  <h1>Library Information System</h1>
+  <div class="subtitle">Books and Borrower's Information System</div>
+</header>
+
+<div class="content">
+
+  <!--BORROWER REGISTRATION FORM -->
+  <!-- Form to add new borrowers to the system -->
+  <div class="section">
+    <div class="section-title">Register Borrower</div>
+    <form id="borrowerForm">
+      <!-- Borrower name input field -->
+      <input type="text" id="borrowerName" placeholder="Borrower Name" required>
+      <!-- Auto-generated ID field-->
+      <input type="text" id="borrowerId" readonly placeholder="Auto ID">
+      <!-- Submit button to add borrower -->
+      <button type="submit" class="primary">Add Borrower</button>
+    </form>
+  </div>
+
+  <!-- BORROWER LIST TABLE -->
+  <div id="borrowerTable" class="section">
+  </div>
+
+  <!--ADD NEW BOOK FORM -->
+  <div class="section">
+    <div class="section-title">Add New Book</div>
+    <form id="bookForm">
+      <input type="text" id="title" placeholder="Book Title" required>
+      <input type="text" id="author" placeholder="Author Name" required>
+      <div style="display:flex;flex-direction:column;">
+        <input type="number" id="year" placeholder="Year (e.g. 2025)" required min="1000" max="9999">
+        <div id="yearInvalidMsg" class="year-invalid">Enter a valid 4-digit year (1000-9999)</div>
+      </div>
+      <button type="submit" class="primary">Add Book</button>
+    </form>
+  </div>
+
+  <!-- MANAGEMENT CONTROLS-->
+  <!-- Buttons to filter, sort, and manage books -->
+  <div class="section">
+    <div class="section-title">Manage & Filter</div>
+    <div class="controls">
+      <button id="filterBtn" class="secondary">Filter (Books published after 2015)</button>
+      <!-- Sort by title dropdown -->
+      <div class="dropdown">
+        <button id="sortTitleBtn" class="secondary">Sort by Title</button>
+        <div class="dropdown-menu" id="titleDropdown">
+          <button data-type="title" data-order="asc">Ascending</button>
+          <button data-type="title" data-order="desc">Descending</button>
+        </div>
+      </div>
+      <!-- Sort by year dropdown -->
+      <div class="dropdown">
+        <button id="sortYearBtn" class="secondary">Sort by Year</button>
+        <div class="dropdown-menu" id="yearDropdown">
+          <button data-type="year" data-order="asc">Ascending</button>
+          <button data-type="year" data-order="desc">Descending</button>
+        </div>
+      </div>
+      <!-- Reset button-->
+      <button id="resetBtn" class="secondary">Reset</button>
+      <!-- Delete all books button -->
+      <button id="deleteAllBtn" class="danger">Delete All</button>
+      <!-- Search input - filters books by title or author -->
+      <input type="text" id="search" placeholder="Search books or authors..." style="margin-left:auto;"> 
+      <!-- Switch between table and card view -->
+      <div style="width:100%;display:flex;justify-content:flex-end;margin-top:8px;">
+        <button id="switchViewBtn" class="secondary">Switch to Card View</button>
+      </div>
+    </div>
+  </div>
+
+  <!--BOOK LIST DISPLAY -->
+  <div class="section">
+    <div class="section-title">Books</div>
+    <div id="bookListBox" class="book-list-box">
+      <div id="list"></div>
+    </div>
+  </div>
+
+  <!--SUMMARY STATISTICS  -->
+  <!-- Displays total, available, borrowed, and overdue counts -->
+  <div id="summary"></div>
+</div>
+</div>
+
+<script>
+
+// BOOK CONSTRUCTOR
+// Creates a new book object with title, author, and year
+function Book(title, author, year) {
+  this.title = title;
+  this.author = author;
+  this.year = year;
+  this.isAvailable = true; // Book starts as available
+  this.isOverdue = false; // Not overdue initially
+  this.borrower = null; // No borrower initially
+  this.borrowDate = null; // No borrow date initially
+  this.dueDate = null; // No due date initially
+}
+
+// BORROWER CONSTRUCTOR 
+// Creates a new borrower object with name and ID
+function Borrower(name, id) {
+  this.name = name;
+  this.id = id;
+  this.borrowed = []; // Array to track borrowed book titles
+
+  // Method to borrow a book
+  this.borrow = function(bookObj) {
+    // Check if book is available
+    if (!bookObj.isAvailable) {
+      const msg = `❌ "${bookObj.title}" is currently not available.`;
+      console.log(msg);
+      return msg;
+    }
+    // Mark book as borrowed
+    bookObj.isAvailable = false;
+    bookObj.borrower = this.name;
+    const borrowDate = new Date();
+    bookObj.borrowDate = borrowDate.toLocaleDateString();
+    // Calculate due date (14 days from borrow date)
+    const due = new Date(borrowDate.getTime() + 14*24*60*60*1000);
+    bookObj.dueDate = due.toLocaleDateString();
+    // Add to borrower's list
+    this.borrowed.push(bookObj.title);
+    const msg = `✅ ${this.name} borrowed "${bookObj.title}" on ${bookObj.borrowDate}. Due ${bookObj.dueDate}.`;
+    console.log('borrow() ->', msg);
+    return msg;
+  };
+
+  // Method to return a book
+  this.returnBook = function(title) {
+    // Check if borrower has this book
+    const idx = this.borrowed.indexOf(title);
+    if (idx === -1) {
+      const msg = `⚠️ ${this.name} has not borrowed "${title}".`;
+      console.log('returnBook() ->', msg);
+      return msg;
+    }
+    // Remove from borrowed list
+    this.borrowed.splice(idx, 1);
+    // Find the book and reset its status
+    const book = books.find(b => b.title === title);
+    if (book) {
+      book.isAvailable = true;
+      book.borrower = null;
+      book.borrowDate = null;
+      book.dueDate = null;
+      book.isOverdue = false;
+    }
+    const msg = `📘 ${this.name} returned "${title}" successfully.`;
+    console.log('returnBook() ->', msg);
+    return msg;
+  };
+}
+
+// GLOBAL VARIABLES 
+let books = []; // Array to store all books
+let borrowers = []; // Array to store all borrowers
+let nextId = 1; // Counter for auto-generating borrower IDs
+let reusableIds = []; // Array to store deleted IDs for reuse
+let viewMode = 'table'; // Current view mode 
+
+// DOM ELEMENTS 
+// Get references to HTML elements
+const listEl = document.getElementById('list');
+const borrowerTableEl = document.getElementById('borrowerTable');
+const summaryEl = document.getElementById('summary');
+const borrowerNameInput = document.getElementById('borrowerName');
+const borrowerIdInput = document.getElementById('borrowerId');
+const bookForm = document.getElementById('bookForm');
+const borrowerForm = document.getElementById('borrowerForm');
+const switchViewBtn = document.getElementById('switchViewBtn');
+
+//  ID MANAGEMENT FUNCTIONS
+// Gets the next available ID (reuses deleted IDs first)
+function getNextId() {
+  if (reusableIds.length > 0) return reusableIds.shift();
+  return nextId++;
+}
+// Peeks at what the next ID will be without consuming it
+function peekNextId() {
+  return reusableIds.length > 0 ? reusableIds[0] : nextId;
+}
+// Updates the borrower ID field when name is typed
+function updateBorrowerIdField() {
+  borrowerIdInput.value = borrowerNameInput.value.trim() ? peekNextId() : '';
+}
+
+//MAIN RENDER FUNCTION 
+// Renders all data to the page
+function render(data = books) {
+  console.log('render() called with', data.length, 'items');
+  renderBooks(data);
+  updateSummary();
+  renderBorrowers();
+}
+// RENDER BOOKS FUNCTION 
+// Renders book list in either table or card view
+function renderBooks(data) {
+  listEl.innerHTML = '';
+  // Show empty state if no books
+  if (!data || data.length === 0) {
+    listEl.innerHTML = '<div class="empty-state">No books available</div>';
+    return;
+  }
+  // Render as table
+  if (viewMode === 'table') {
+    const table = document.createElement('table');
+    const header = document.createElement('tr');
+    header.innerHTML = '<th>Title</th><th>Author</th><th>Year</th><th>Status</th><th>Borrower</th><th>Borrow Date</th><th>Due Date</th><th>Actions</th>';
+    table.appendChild(header);
+    // Create a row for each book
+    data.forEach((b, i) => {
+      const row = document.createElement('tr');
+      const status = b.isOverdue ? 'Overdue' : (b.isAvailable ? 'Available' : 'Borrowed');
+      row.innerHTML = `
+        <td>${escapeHtml(b.title)}</td>
+        <td>${escapeHtml(b.author)}</td>
+        <td>${b.year}</td>
+        <td class="${(b.isOverdue ? 'overdue' : (b.isAvailable ? 'available' : 'borrowed'))}">${status}</td>
+        <td>${b.borrower || '-'}</td>
+        <td>${b.borrowDate || '-'}</td>
+        <td>${b.dueDate || '-'}</td>
+        <td class="actions">
+          <button class="secondary" data-action="borrow" data-index="${i}">Borrow</button>
+          <button class="secondary" data-action="return" data-index="${i}">Return</button>
+          <button class="secondary" data-action="mark" data-index="${i}">Mark Overdue</button>
+          <button class="secondary" data-action="edit" data-index="${i}">Edit</button>
+          <button class="danger" data-action="delete" data-index="${i}">Delete</button>
+        </td>`;
+      table.appendChild(row);
+    });
+
+    listEl.appendChild(table);
+  } 
+  // Render as cards
+  else { 
+    const grid = document.createElement('div');
+    grid.className = 'card-grid';
+    // Create a card for each book
+    data.forEach((b, i) => {
+      const card = document.createElement('div');
+      card.className = 'card';
+      card.innerHTML = `
+        <h3>${escapeHtml(b.title)}</h3>
+        <p><strong>Author:</strong> ${escapeHtml(b.author)}</p>
+        <p><strong>Year:</strong> ${b.year}</p>
+        <p class="${b.isAvailable ? 'status available' : (b.isOverdue ? 'overdue' : 'status borrowed')}"><strong>Status:</strong> ${b.isOverdue ? 'Overdue' : (b.isAvailable ? 'Available' : 'Borrowed')}</p>
+        <p><strong>Borrower:</strong> ${b.borrower || '-'}</p>
+        <p><strong>Borrow Date:</strong> ${b.borrowDate || '-'}</p>
+        <p><strong>Due Date:</strong> ${b.dueDate || '-'}</p>
+        <div class="actions" style="margin-top:8px;">
+          <button class="secondary" data-action="borrow" data-index="${i}">Borrow</button>
+          <button class="secondary" data-action="return" data-index="${i}">Return</button>
+          <button class="secondary" data-action="mark" data-index="${i}">Mark Overdue</button>
+          <button class="secondary" data-action="edit" data-index="${i}">Edit</button>
+          <button class="danger" data-action="delete" data-index="${i}">Delete</button>
+        </div>
+      `;
+      grid.appendChild(card);
+    });
+    listEl.appendChild(grid);
+  }
+  // Attach click handlers to all action buttons
+  listEl.querySelectorAll('[data-action]').forEach(btn => {
+    btn.onclick = () => {
+      const action = btn.dataset.action;
+      const idx = parseInt(btn.dataset.index, 10);
+      if (action === 'borrow') openBorrowModal(idx);
+      if (action === 'return') handleReturnByIndex(idx);
+      if (action === 'mark') markOverdueByIndex(idx);
+      if (action === 'delete') handleDeleteByIndex(idx);
+      if (action === 'edit') openEditModal(idx);
+    };
+  });
+}
+
+// UPDATE SUMMARY FUNCTION 
+// Calculates and displays library statistics
+function updateSummary(){
+  const total = books.length;
+  const available = books.filter(b=>b.isAvailable).length;
+  const borrowed = books.filter(b=>!b.isAvailable && !b.isOverdue).length;
+  const overdue = books.filter(b=>b.isOverdue).length;
+  summaryEl.innerHTML=`
+    <div class="stat"><div class="stat-label">Total Books</div><div class="stat-value">${total}</div></div>
+    <div class="stat"><div class="stat-label">Available</div><div class="stat-value">${available}</div></div>
+    <div class="stat"><div class="stat-label">Borrowed</div><div class="stat-value">${borrowed}</div></div>
+    <div class="stat"><div class="stat-label">Overdue</div><div class="stat-value">${overdue}</div></div>
+  `;
+  console.log('Summary updated', { total, available, borrowed, overdue });
+}
+
+//  RENDER BORROWERS FUNCTION 
+// Displays table of all borrowers and their borrowed books
+function renderBorrowers(){
+  // Show empty state if no borrowers
+  if(borrowers.length===0){
+    borrowerTableEl.innerHTML = '<div class="section-title">Borrowers</div><div class="empty-state">No borrowers registered</div>';
+    console.log('Borrowers array: []');
+    return;
+  }
+  // Build borrower table HTML
+  let btable = '<div class="section-title">Borrowers</div>';
+  btable += '<table><tr><th>Name</th><th>ID</th><th>Borrowed Book/s</th><th>Actions</th></tr>';
+  borrowers.forEach(br=>{
+    btable += `<tr>
+      <td>${escapeHtml(br.name)}</td>
+      <td>${br.id}</td>
+      <td>${br.borrowed.length ? br.borrowed.join(', ') : '-'}</td>
+      <td><button class="danger" onclick="deleteBorrower(${br.id})">Delete</button></td>
+    </tr>`;
+  });
+  btable += '</table>';
+  borrowerTableEl.innerHTML = btable;
+  console.log('Borrowers array:', JSON.parse(JSON.stringify(borrowers)));
+}
+
+function escapeHtml(s){ 
+  if(!s) return ''; 
+  return s.replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); 
+}
+
+//INITIALIZE BORROWER ID FIELD 
+updateBorrowerIdField();
+// Update ID field as user types name
+borrowerNameInput.addEventListener('input', updateBorrowerIdField);
+
+// BORROWER FORM SUBMISSION 
+// Handles adding new borrowers
+document.getElementById('borrowerForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const name = borrowerNameInput.value.trim();
+  if(!name) return alert('Please enter borrower name.');
+  
+  // Create new borrower with auto-generated ID
+  const id = getNextId();
+  const newBr = new Borrower(name, id);
+  borrowers.push(newBr);
+  console.log('Borrower added:', JSON.parse(JSON.stringify(newBr)));
+  
+  // Reset form and update display
+  borrowerForm.reset();
+  borrowerIdInput.value = '';
+  updateBorrowerIdField();
+  render();
+});
+
+//  YEAR VALIDATION  
+// Shows error message if year is invalid
+const yearInput = document.getElementById('year');
+const yearInvalidMsg = document.getElementById('yearInvalidMsg');
+yearInput.addEventListener('input', ()=>{
+  const y = parseInt(yearInput.value,10);
+  if(isNaN(y) || y < 1000 || y > 9999) {
+    yearInvalidMsg.style.display = 'block';
+  } else {
+    yearInvalidMsg.style.display = 'none';
+  }
+});
+
+// BOOK FORM SUBMISSION
+// Handles adding new books
+document.getElementById('bookForm').addEventListener('submit', e=>{
+  e.preventDefault();
+  const title = document.getElementById('title').value.trim();
+  const author = document.getElementById('author').value.trim();
+  const year = parseInt(document.getElementById('year').value, 10);
+  
+  // Validate all fields
+  if(!title||!author||isNaN(year)||year<1000||year>9999){
+    alert('Fill all fields with valid values (Year: 1000–9999).');
+    return;
+  }
+  
+  // Create and add new book
+  const newBook = new Book(title, author, year);
+  books.push(newBook);
+  console.log('Book added:', JSON.parse(JSON.stringify(newBook)));
+  
+  // Reset form and update display
+  e.target.reset();
+  yearInvalidMsg.style.display = 'none';
+  render();
+});
+
+// DELETE BORROWER FUNCTION 
+// Removes a borrower from the system
+function deleteBorrower(id){
+  const br = borrowers.find(b=>b.id===id);
+  if(!br) return;
+  
+  // Prevent deletion if borrower has books
+  if(br.borrowed.length>0){ 
+    alert('Cannot delete borrower with borrowed books'); 
+    return; 
+  }
+  
+  if(!confirm('Delete this borrower?')) return;
+  
+  // Remove borrower and make ID reusable
+  borrowers = borrowers.filter(b=>b.id!==id);
+  reusableIds.push(id);
+  reusableIds.sort((a,b)=>a-b);
+  console.log('Borrower deleted:', id);
+  updateBorrowerIdField();
+  render();
+}
+
+// OPEN BORROW MODAL
+// Shows popup to select borrower for a book
+function openBorrowModal(index){
+  const book = books[index];
+  if(!book) return;
+  if(!book.isAvailable){ alert('Not available'); return; }
+  if(borrowers.length===0){ alert('No borrowers registered'); return; }
+
+  // Create modal overlay
+  const overlay = document.createElement('div'); 
+  overlay.className='overlay-modal';
+  const box = document.createElement('div'); 
+  box.className='modal-box';
+  
+  // Build borrower dropdown options
+  const options = borrowers.map(b=>`<option value="${b.id}">${escapeHtml(b.name)} (${b.id})</option>`).join('');
+  box.innerHTML = `<h3>Borrow "${escapeHtml(book.title)}"</h3>
+    <select id="borrowSelect"><option value="">Select borrower</option>${options}</select>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+      <button id="confirmBorrowBtn" class="primary">Confirm</button>
+      <button id="cancelBorrowBtn" class="secondary">Cancel</button>
+    </div>`;
+  overlay.appendChild(box); 
+  document.body.appendChild(overlay);
+
+  // Confirm button handler
+  document.getElementById('confirmBorrowBtn').onclick = ()=>{
+    const id = parseInt(document.getElementById('borrowSelect').value,10);
+    if(!id){ alert('Select a borrower'); return; }
+    const borrower = borrowers.find(b=>b.id===id);
+    if(!borrower){ alert('Borrower not found'); document.body.removeChild(overlay); return; }
+    
+    // Execute borrow action
+    const msg = borrower.borrow(book);
+    console.log('Borrow action:', msg);
+    document.body.removeChild(overlay);
+    render();
+  };
+  
+  // Cancel button handler
+  document.getElementById('cancelBorrowBtn').onclick = ()=>{
+    document.body.removeChild(overlay);
+  };
+}
+
+//RETURN BOOK FUNCTION
+// Handles returning a borrowed book
+function handleReturnByIndex(index){
+  const book = books[index];
+  if(!book || book.isAvailable){ alert('Book not borrowed'); return; }
+  
+  // Find borrower and call return method
+  const borrower = borrowers.find(b=>b.name===book.borrower);
+  if(borrower){
+    const msg = borrower.returnBook(book.title);
+    console.log('Return action:', msg);
+  } else {
+    console.log('Return fallback: borrower record missing for', book.title);
+  }
+  
+  // Reset book status
+  Object.assign(book,{isAvailable:true,borrower:null,borrowDate:null,dueDate:null,isOverdue:false});
+  render();
+}
+
+// MARK OVERDUE FUNCTION
+// Marks a borrowed book as overdue
+function markOverdueByIndex(index){
+  const book = books[index];
+  if(!book || book.isAvailable){ alert('Book must be borrowed to mark overdue'); return; }
+  
+  book.isOverdue = true;
+  console.log('Book marked overdue:', JSON.parse(JSON.stringify(book)));
+  render();
+}
+
+//DELETE BOOK FUNCTION 
+// Removes a book from the library
+function handleDeleteByIndex(index){
+  const book = books[index];
+  if(!book) return;
+  if(!confirm('Delete this book?')) return;
+  
+  // Remove book from all borrowers' lists
+  borrowers.forEach(br=> br.borrowed = br.borrowed.filter(t=>t!==book.title));
+  books.splice(index,1);
+  console.log('Book deleted:', { title: book.title, year: book.year });
+  render();
+}
+
+//  OPEN EDIT MODAL 
+// Shows popup to edit book details
+function openEditModal(index){
+  const book = books[index];
+  if(!book) return;
+  
+  // Create modal overlay
+  const overlay = document.createElement('div'); 
+  overlay.className='overlay-modal';
+  const box = document.createElement('div'); 
+  box.className='modal-box';
+  
+  // Pre-fill form with current book data
+  box.innerHTML = `
+    <h3>Edit Book</h3>
+    <input id="editTitle" type="text" value="${escapeHtml(book.title)}" placeholder="Title">
+    <input id="editAuthor" type="text" value="${escapeHtml(book.author)}" placeholder="Author">
+    <input id="editYear" type="number" min="1000" max="9999" value="${book.year}" placeholder="e.g. 2025">
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+      <button id="saveEditBtn" class="primary">Save</button>
+      <button id="cancelEditModalBtn" class="secondary">Cancel</button>
+    </div>`;
+  overlay.appendChild(box); 
+  document.body.appendChild(overlay);
+
+  // Save button handler
+  document.getElementById('saveEditBtn').onclick = ()=>{
+    const t = document.getElementById('editTitle').value.trim();
+    const a = document.getElementById('editAuthor').value.trim();
+    const y = parseInt(document.getElementById('editYear').value,10);
+    
+    // Validate input
+    if(!t||!a||isNaN(y)||y<1000||y>9999){ 
+      alert('Please enter valid title, author, and year (1000–9999).'); 
+      return; 
+    }
+    
+    // Update book data
+    book.title = t; 
+    book.author = a; 
+    book.year = y;
+    console.log('Book edited:', JSON.parse(JSON.stringify(book)));
+    document.body.removeChild(overlay);
+    render();
+  };
+  
+  // Cancel button handler
+  document.getElementById('cancelEditModalBtn').onclick = ()=>{
+    document.body.removeChild(overlay);
+  };
+}
+
+// FILTER BUTTON 
+// Shows only books published after 2015
+document.getElementById('filterBtn').addEventListener('click', ()=>{
+  const filtered = books.filter(b=>b.year>2015);
+  console.log('Filter applied (year>2015):', JSON.parse(JSON.stringify(filtered)));
+  render(filtered);
+});
+
+//  RESET BUTTON 
+// Clears all filters and shows all books
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  console.log('Reset filters - rendering full list');
+  render();
+});
+
+// DELETE ALL BUTTON
+// Removes all books from the library
+document.getElementById('deleteAllBtn').addEventListener('click', ()=>{
+  if(!confirm('Delete all books?')) return;
+  books = [];
+  borrowers.forEach(br=> br.borrowed = []);
+  console.log('All books deleted; borrowers cleared of borrowed lists');
+  render();
+});
+
+//  DROPDOWN TOGGLE HANDLERS
+document.getElementById('sortTitleBtn').addEventListener('click', ()=> toggleDropdown('titleDropdown'));
+document.getElementById('sortYearBtn').addEventListener('click', ()=> toggleDropdown('yearDropdown'));
+
+// Toggle dropdown menu visibility
+function toggleDropdown(id){ 
+  const dd = document.getElementById(id); 
+  dd.style.display = dd.style.display==='block' ? 'none' : 'block'; 
+}
+
+// SORT BUTTON HANDLERS
+// Handles sorting books by title or year
+document.querySelectorAll('.dropdown-menu button').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    const type = btn.dataset.type, order = btn.dataset.order;
+    
+    // Sort by title alphabetically
+    if(type==='title') books.sort((a,b)=> order==='asc' ? a.title.localeCompare(b.title) : b.title.localeCompare(a.title));
+    
+    // Sort by year numerically
+    if(type==='year') books.sort((a,b)=> order==='asc' ? a.year - b.year : b.year - a.year);
+    
+    console.log(`Sorted by ${type} (${order})`);
+    toggleDropdown(type==='title' ? 'titleDropdown' : 'yearDropdown');
+    console.log('Books after sort:', JSON.parse(JSON.stringify(books.map(b=>({ title: b.title, year: b.year })))) );
+    render();
+  });
+});
+
+//  SEARCH INPUT
+// Filters books by title or author as user types
+document.getElementById('search').addEventListener('input', e=>{
+  const key = e.target.value.trim().toLowerCase();
+  
+  // Show all if search is empty
+  if(!key){ 
+    console.log('Search cleared - rendering all'); 
+    render(); 
+    return; 
+  }
+  
+  // Filter books matching search term
+  const results = books.filter(b => b.title.toLowerCase().includes(key) || b.author.toLowerCase().includes(key));
+  console.log(`Search for "${key}" returned ${results.length} results`, JSON.parse(JSON.stringify(results)));
+  render(results);
+});
+
+//SWITCH VIEW BUTTON 
+// Toggles between table and card view
+document.getElementById('switchViewBtn').addEventListener('click', ()=>{
+  viewMode = viewMode === 'table' ? 'card' : 'table';
+  document.getElementById('switchViewBtn').textContent = viewMode === 'table' ? 'Switch to Card View' : 'Switch to Table View';
+  console.log('View toggled to', viewMode);
+  render();
+});
+
+// INITIAL RENDER 
+// Set up initial state and render empty page
+updateBorrowerIdField();
+render();
+console.log('Initial state - books and borrowers empty arrays');
+
+</script>
+</body>
+</html>
